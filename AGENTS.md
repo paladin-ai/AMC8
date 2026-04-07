@@ -26,7 +26,7 @@ Monorepo: **Flutter app** in `frontend/`, **FastAPI API** in `backend/`.
 
 - **`.cursor/rules/`** — Cursor agent rules.
 - **`documents/`** — optional docs.
-- **`ZZZ_zzz.rules-new/`** — archived rule snapshots (superseded by `.cursor/rules/`).
+- **`ZZZ_.rules-new/`** — archived rule snapshots (superseded by `.cursor/rules/`).
 
 ## Native platforms
 

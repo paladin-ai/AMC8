@@ -21,3 +21,4 @@ backend/data/*.db-*
 
 # Local tooling / large downloads (keep out of git if added)
 tool/*.zip
+tool/**/__pycache__/

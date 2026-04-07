@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
+import 'package:amc8/core/desktop_sqflite_init.dart';
 import 'package:amc8/screens/auth/login_screen.dart';
 import 'package:amc8/screens/auth/register_screen.dart';
 import 'package:amc8/screens/home/home_page.dart';
 import 'package:amc8/theme/app_theme.dart';
 
-/// Desktop / test runners need sqflite FFI before any DB access.
+/// Desktop (Windows / Linux / macOS) needs sqflite FFI before DB access.
+/// Android / iOS must keep the default [databaseFactory] — do not set FFI there.
 void main() {
-  sqfliteFfiInit();
-  databaseFactory = databaseFactoryFfi;
-
+  initDesktopSqflite();
   runApp(const Amc8Root());
 }
 

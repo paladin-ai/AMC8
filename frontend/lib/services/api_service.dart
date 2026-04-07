@@ -6,8 +6,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:amc8/services/session_prefs.dart';
 
-/// API 根地址（阿里云服务器）
-const String baseUrl = 'http://47.76.160.69';
+/// API 根地址。生产默认直连服务器；Flutter Web 本地调试若遇 CORS，先运行
+/// `python tool/dev_api_proxy.py`，再：
+/// `flutter run -d chrome --dart-define=API_BASE_URL=http://127.0.0.1:8787`
+const String baseUrl = String.fromEnvironment(
+  'API_BASE_URL',
+  defaultValue: 'http://47.76.160.69',
+);
 
 /// 登录接口 `app_name`（与后端约定，例如 `AMC8`）
 const String kApiAppName = 'AMC8';
@@ -169,6 +174,12 @@ class ApiService {
         msg = 'Connection timed out. Check your network and try again.';
       case DioExceptionType.connectionError:
         msg = "Can't reach the server. Check your network or the server address.";
+        if (kIsWeb) {
+          msg =
+              "$msg On Flutter Web, the browser may block cross-origin HTTP (CORS): "
+              "enable CORS on the API, or run tool/dev_api_proxy.py and use "
+              "--dart-define=API_BASE_URL=http://127.0.0.1:8787";
+        }
       case DioExceptionType.badCertificate:
         msg = 'Certificate error';
       case DioExceptionType.badResponse:
@@ -250,6 +261,10 @@ class ApiService {
           'app_relation': appRelation,
           'expire_time': expireTime,
         },
+        options: Options(
+          contentType: null,
+          headers: {Headers.acceptHeader: 'application/json'},
+        ),
       );
       final data = _parseApiBody(response.data, httpStatus: response.statusCode);
       return data;

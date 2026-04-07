@@ -4,6 +4,11 @@ alwaysApply: true
 ---
 # Clean Code Guidelines
 
+##Clean folder path definition
+- Use relative paths in config files (./data.db instead of C:\...\data.db).
+- Use ${workspaceFolder} in Cursor/VS Code launch.json.
+- Store virtual environments inside the project folder (e.g., ./venv).
+
 ## Constants Over Magic Numbers
 - Replace hard-coded values with named constants
 - Use descriptive constant names that explain the value's purpose
