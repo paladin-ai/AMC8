@@ -1,0 +1,71 @@
+---
+description: "Frontend rules for AMC8 AI Tutor – Flutter + SQLite mobile app."
+globs: "**/*.{dart,yaml,yml}"
+alwaysApply: true
+---
+
+# AMC8 AI Tutor – Frontend Rules (Flutter + SQLite)
+
+## 🎯 Shared Goal
+Develop **AMC8 AI Tutor**, a mobile app for practicing the AMC8 Olympic mathematics contest (MAA).
+
+## 📱 Mobile Tech Stack (Strict)
+- **Framework**: Flutter (Dart)
+- **Local DB**: SQLite (use `drift` or `sqflite`)
+- **State Management**: Pick one (Provider / Riverpod / Bloc) and be consistent.
+
+## 📋 Phase 1 Features (Frontend Responsibilities)
+
+### 1. User Management (UI & local cache)
+- Registration, password reset, profile update (name, email, phone, language).
+- **UI labels must switch dynamically** based on user’s language choice (no restart).
+- Cache user profile in SQLite.
+
+### 2. Past Paper List by Year
+- Display papers grouped by year.
+- Each paper offers two test modes:
+  - No time limit
+  - Standard AMC8 time limit
+
+### 3. Results & Scoring
+- After test completion, save locally in SQLite:
+  - Test score
+  - Detailed per-question results (correct/incorrect, time spent, etc.)
+
+### 4. Wrong Answer List
+- Dedicated screen showing all incorrectly answered questions (from local history).
+
+### 5. Review Marking
+- Allow users to mark any question for later review.
+- Persist review marks in SQLite.
+
+### 6. Re‑testing
+- Practice selected questions from:
+  - Wrong answer list only
+  - Review list only
+  - Combination of both (user selects which)
+
+## 🗄️ Local Data Rules
+- SQLite caches:
+  - User profile
+  - Past papers & questions
+  - Test attempts, scores, wrong answers, review marks
+- Sync with cloud via FastAPI (see backend rule).
+
+## 📱 Flutter Development Guidelines
+- Use `shared_preferences` only for lightweight preferences (e.g., session token), not for question data.
+- Keep UI responsive – `LayoutBuilder` or `MediaQuery`.
+- Write unit tests for scoring logic, time limit enforcement, and local DB operations.
+- Follow project structure:
+
+mobile/lib/
+├── models/
+├── screens/
+├── widgets/
+├── services/ # API client, SQLite helper
+└── utils/
+
+
+## 🔗 Backend Integration
+- All API calls go to FastAPI backend (see `amc8-backend.mdc`).
+- Handle offline mode gracefully – queue sync when network returns.

@@ -1,0 +1,49 @@
+---
+description: Flutter and Dart conventions for the AMC8 AI Tutor mobile app
+globs:
+  - "lib/**/*.dart"
+  - "test/**/*.dart"
+  - "pubspec.yaml"
+  - "pubspec.lock"
+  - "analysis_options.yaml"
+alwaysApply: false
+---
+# Flutter & Dart (AMC8 AI Tutor)
+
+## Style & analysis
+- Follow [Effective Dart](https://dart.dev/effective-dart) and the project `analysis_options.yaml` / `flutter_lints` rules.
+- Prefer `final` for locals assigned once; use `const` constructors and literals wherever possible.
+
+## Widgets & UI
+- Keep `build` methods small; extract private `_FooWidget` classes when a section exceeds ~40 lines or has its own state.
+- Use `Theme.of(context).colorScheme` and `TextTheme` — never hard-coded hex colors or font sizes.
+- Never perform async work inside `build()`; load data in `initState`, a controller, or via `FutureBuilder`/`StreamBuilder`.
+
+## State & async
+- Use `async`/`await` with explicit `try`/`catch` for all I/O and network calls.
+- Keep navigation, dialog, and snackbar calls out of pure data-parsing helpers.
+- Use `dio` for HTTP calls to the FastAPI backend; centralise base URL and auth header injection in a single client helper in `lib/services/`.
+
+## Data & persistence (offline-first)
+- This app is offline-first: all question data and user results are cached in SQLite (`sqflite`); the backend is the source of truth but must not be required for practice.
+- Wrap multi-row writes (save session + answers) in a `transaction()`; never leave partial writes on failure.
+- Sync results to the backend after a test session completes; surface sync failures with a non-intrusive retry UI rather than blocking the user.
+- Never block the UI isolate with heavy queries; use `compute()` for large data processing.
+
+## Test session logic
+- A test session has exactly two modes: **unlimited** (no timer) and **timed** (standard AMC8: 40 minutes, 25 questions).
+- Encapsulate session state (current question index, elapsed time, answers map, mode) in a dedicated model/controller class — not as ad-hoc widget fields.
+- The countdown timer must survive widget rebuilds; drive it from a controller that is disposed in `dispose()`.
+- On session completion, immediately persist the result to SQLite before any navigation.
+
+## Wrong answer & review lists
+- A question can be in the wrong-answer list, the review-marked list, or both simultaneously — model this correctly in the DB and UI.
+- Re-test mode must support selecting from wrong answers, review marks, or any combination; pass the selected question IDs as a list, not a filter string.
+
+## User management
+- After login, cache the user profile (name, email, phone, language) in SQLite for offline display.
+- Profile updates must be sent to the backend; only commit the local cache after a successful API response.
+- Language preference (`AppLanguage.code`) is part of the user profile and must be persisted across app restarts — see `i18n-flutter.mdc`.
+
+## Platform
+- When changing native permissions or icons, edit `android/` and `ios/` together and document non-obvious reasons in a code comment.

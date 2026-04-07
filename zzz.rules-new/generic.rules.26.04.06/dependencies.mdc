@@ -1,0 +1,22 @@
+---
+description: Dependency and version policy for Dart / Flutter (pubspec)
+globs:
+  - "pubspec.yaml"
+  - "pubspec.lock"
+alwaysApply: false
+---
+# Dependencies (Dart / Flutter)
+
+## Pinning
+- Keep `pubspec.yaml` constraints explicit enough for reproducible builds; commit `pubspec.lock` for apps (this project is an app).
+
+## Updates
+- Prefer periodic `dart pub outdated` (or `flutter pub outdated`) over random major bumps.
+- Before upgrading a **major** version, read the changelog and run `flutter analyze` and `flutter test`.
+
+## Adding packages
+- Prefer packages that are actively maintained and widely used; check pub.dev scores and last publish date.
+- Remove unused dependencies to shrink the attack surface and build time.
+
+## Native / codegen
+- After changing dependencies that affect Android/iOS/macOS, run the app on at least one target or CI to catch native build breaks.

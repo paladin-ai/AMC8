@@ -1,0 +1,52 @@
+---
+description: SQLite-first data layer — mobile (sqflite) and server (FastAPI)
+globs:
+  - "lib/**/*.dart"
+  - "app/**/*.py"
+  - "api/**/*.py"
+  - "backend/**/*.py"
+  - "alembic/**"
+  - "**/*.sql"
+alwaysApply: false
+---
+# Database Guidelines
+
+## Architecture (single stack)
+
+SQLite everywhere — bundled/read-only DB on device for problems + app SQLite for user data; server uses a single (or few) SQLite file(s) with FastAPI, with clear rules for backups, concurrency, and where the file lives.
+
+There is **no PostgreSQL** in this stack; do not introduce `asyncpg` or Postgres-specific SQL.
+
+## SQLite – mobile (Flutter / sqflite)
+
+### Bundled problem bank (read-only asset)
+
+- Bump `_bundledDbRevision` in `lib/data/db_helper.dart` every time `assets/math_problems.db` changes so existing installs refresh their local copy.
+- Treat the shipped asset as **read-only** for app logic; refresh by copying from assets when revision bumps.
+
+### App-writable local data (user sessions, profile cache, etc.)
+
+- Use a **separate** writable database file (or clearly separated tables in a copied DB) for user profile, sessions, scores, wrong answers, and review marks — do not overwrite the bundled problem source of truth.
+- Use the `DBHelper` singleton per file; never open multiple connections to the same path.
+- Wrap multi-step writes (e.g. save session + save answers) in a `transaction()`; never leave partial writes on failure.
+- Use parameterised `?` placeholders for all user-supplied values to prevent SQL injection.
+- Run heavy read operations (large result sets) via `compute()` or an isolate to avoid janking the UI thread.
+- For schema changes add explicit `onUpgrade` steps; do not drop-and-recreate tables without migrating existing user data.
+- Typical tables: `users`, `test_sessions`, `session_answers`, `review_marks`, `wrong_answers_cache` (names as implemented in code).
+
+## SQLite – server (FastAPI)
+
+- **Where the file lives**: load path from configuration (e.g. `DATABASE_PATH` / `SQLITE_PATH` via `pydantic-settings`). Use a directory on local disk that is **writable** by the process; do not commit database files to git. Avoid network filesystems (e.g. NFS) for the live DB file unless you accept latency and locking risks.
+- **Concurrency**: SQLite allows one writer at a time; keep transactions **short**. Prefer **WAL** journal mode for concurrent readers + one writer where appropriate. Do not rely on PostgreSQL-style connection pooling semantics.
+- **Backups**: periodic **file copy** of the SQLite file while idle or use SQLite backup APIs / `VACUUM INTO`; verify restores in staging. Document retention policy.
+- **Schema changes**: use **Alembic** (SQLite-supported) or checked-in SQL migrations; never hand-edit production schema without a migration.
+- **ORM**: SQLAlchemy models in `app/models/` (or `backend/…`); separate from Pydantic schemas in `app/schemas/`. Use **async** access via `aiosqlite` (or equivalent) with FastAPI’s async routes.
+- Add indexes on high-frequency columns: `user_id`, `year`, `problem_number`, `session_id`, `created_at`.
+- Store timestamps in **UTC**; convert to local time on clients.
+- Prefer explicit column lists over `SELECT *` in hot paths.
+
+## Shared rules
+
+- Never log raw SQL that contains user PII (name, email, answers).
+- Validate all data at the service layer before writing; raise an error rather than storing garbage.
+- Test database code against **in-memory or temp-file SQLite**; never point tests at production server files.

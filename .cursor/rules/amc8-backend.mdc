@@ -1,0 +1,37 @@
+---
+description: "Backend rules for AMC8 AI Tutor – FastAPI + SQLite (no PostgreSQL)."
+globs: "**/*.{py,toml,yml,yaml}"
+alwaysApply: true
+---
+
+# AMC8 AI Tutor – Backend Rules (FastAPI + SQLite)
+
+## Architecture (single stack)
+
+SQLite everywhere — bundled/read-only DB on device for problems + app SQLite for user data; server uses a single (or few) SQLite file(s) with FastAPI, with clear rules for backups, concurrency, and where the file lives.
+
+Do **not** use PostgreSQL, `asyncpg`, or Postgres-specific deployment assumptions for this project.
+
+## Backend tech stack
+
+- **API**: FastAPI (Python), Pydantic v2 for request/response schemas.
+- **Persistence**: **SQLite** on the server (one primary `.db` file or a small, documented set of files). SQLAlchemy + `aiosqlite` (or equivalent async SQLite driver) for async routes.
+- **Migrations**: Alembic or versioned SQL; target SQLite only.
+- **Auth**: JWT, password hashing (e.g. bcrypt); secrets from environment variables.
+
+## Responsibilities
+
+- User accounts, sessions, scoring, wrong-answer and review-mark sync as defined in API contracts.
+- Same business rules as the mobile app where data overlaps; server DB is the authority for **synced** account/session data when online.
+- Rate-limit auth endpoints; HTTPS in production; structured logging without PII in query logs.
+
+## Integration with mobile
+
+- Mobile app uses **sqflite** locally (bundled problems + writable user data); see `amc8-frontend.mdc` and `database.mdc`.
+- Clients call this API over HTTP; handle offline/queue on the client — see `amc8-frontend.mdc`.
+
+## Detailed database conventions
+
+- File placement, backups, WAL, and concurrency: see **`database.mdc`**.
+- FastAPI routing and error handling: see **`fastapi.mdc`**.
+- Python style: see **`python.mdc`**.

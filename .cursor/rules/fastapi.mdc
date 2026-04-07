@@ -1,0 +1,59 @@
+---
+description: FastAPI backend conventions for AMC8 AI Tutor (users, papers, sessions, scoring)
+globs:
+  - "app/**/*.py"
+  - "api/**/*.py"
+  - "tests/**/*.py"
+  - "alembic/**"
+alwaysApply: false
+---
+# FastAPI – AMC8 AI Tutor Backend
+
+## Domain routers
+Organise routes into one file per domain under `app/routers/`:
+- `users.py` — registration, login, password reset, profile update (name, email, phone, language)
+- `papers.py` — list past papers by year; fetch questions for a paper
+- `sessions.py` — create test session, submit answers, retrieve session detail
+- `results.py` — user score history, wrong answer list, review marks
+
+## Authentication
+- Issue JWT access tokens on login using `python-jose`; sign with `HS256` and a secret from env.
+- Hash passwords with `bcrypt` via `passlib`; never store or log plain-text passwords.
+- Use `OAuth2PasswordBearer` as the FastAPI dependency; inject a `current_user` dependency in protected routes.
+- Password reset flow: generate a short-lived signed token (JWT or HMAC, 15–30 min TTL) and deliver it out-of-band (email/SMS); invalidate after first use.
+
+## Pydantic schemas (v2)
+- Define request and response schemas in `app/schemas/`; never expose ORM models directly.
+- Use `model_config = ConfigDict(from_attributes=True)` on response schemas to allow ORM-to-schema conversion.
+- Validate enum fields (e.g. `language: Literal["en", "zh-Hans", "zh-Hant"]`, `session_mode: Literal["unlimited", "timed"]`) at the schema level.
+
+## Database (SQLAlchemy async + SQLite + Alembic)
+- Use an **async** engine backed by **SQLite** (e.g. `aiosqlite`); inject a `get_db` dependency that yields an `AsyncSession`. Do **not** use `asyncpg` or PostgreSQL.
+- Keep ORM models in `app/models/`; run all schema changes through Alembic migrations (SQLite-compatible).
+- Core tables: `users`, `papers`, `problems`, `test_sessions`, `session_answers`, `review_marks`.
+- Index `user_id`, `year`, `problem_id`, `session_id`, and `created_at` on high-query tables.
+- Database file path and backup rules: see `database.mdc`.
+
+## CORS
+- Allow mobile app origins explicitly; in production restrict to known app bundle identifiers / domains.
+- Enable CORS middleware in `main.py` with `allow_credentials=True` for JWT cookie flows.
+
+## Scoring and results
+- Score a completed session server-side: count correct answers, persist score + per-answer correctness to `session_answers`.
+- Wrong answers: query `session_answers` where `is_correct = false`; deduplicate by `problem_id` for the wrong-answer list.
+- Review marks: a simple `user_id + problem_id` join table with an `is_marked` flag; toggle endpoint `PATCH /review/{problem_id}`.
+- Re-test session: accept a list of `problem_ids` from the client; create a new session of mode `unlimited` or `timed`.
+
+## Error handling
+- Always raise `HTTPException`; never let SQLAlchemy `IntegrityError` or other raw exceptions reach the client.
+- Return `422` for validation errors (FastAPI default), `401` for unauthenticated, `403` for forbidden, `404` for missing resources.
+- Log errors server-side with structured logging (include `user_id` and `request_id` where available, never PII).
+
+## Security
+- Load all secrets (`SECRET_KEY`, SQLite path (e.g. `DATABASE_PATH` / `SQLITE_PATH`), SMTP credentials) from environment variables via `pydantic-settings`.
+- Apply rate limiting to auth endpoints (`/login`, `/register`, `/password-reset`) to slow brute-force attempts.
+- Set `Strict-Transport-Security`, `X-Content-Type-Options`, and `X-Frame-Options` headers in production.
+
+## Testing
+- Use `pytest-asyncio` + `httpx.AsyncClient` for route-level tests against a dedicated test database.
+- Test the happy path and failure cases for auth, session creation, and scoring.

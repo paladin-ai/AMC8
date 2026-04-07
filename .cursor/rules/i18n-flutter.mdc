@@ -1,0 +1,34 @@
+---
+description: Internationalisation (i18n) rules for dynamic UI language switching (en / zh) in AMC8 AI Tutor
+globs:
+  - "lib/**/*.dart"
+  - "lib/core/app_language.dart"
+alwaysApply: false
+---
+# Internationalisation – Flutter (AMC8 AI Tutor)
+
+## Language codes
+- Supported languages for Phase 1: `"en"` (English), `"zh-Hans"` (Chinese Simplified), `"zh-Hant"` (Chinese Traditional).
+- The active language is stored in `AppLanguage.code` (`lib/core/app_language.dart`); use the named constants (`AppLanguage.english`, `AppLanguage.chineseSimplified`, `AppLanguage.chineseTraditional`) — never raw string literals.
+- The allowlist lives in `AppLanguage.supported`; add new codes there together with a `displayNames` entry and matching label keys.
+
+## No hard-coded strings in widgets
+- Every user-visible string (labels, buttons, error messages, placeholders) must be looked up via the i18n helper, not written directly in the widget tree.
+- Pattern: maintain a `Map<String, Map<String, String>>` (or equivalent class) keyed by code; widgets call `L.of('key')` or equivalent.
+- Only untranslated proper nouns (e.g. "AMC8", "MAA") may be written literally.
+
+## Language persistence
+- Persist the user's language choice to the local SQLite profile row immediately on change.
+- On login/app start, read the persisted language before building the first screen so there is no flash of the wrong language.
+- After a successful profile update on the backend, also update the local SQLite cache to stay in sync.
+
+## Triggering a UI rebuild
+- `AppLanguage.code` is a plain static field; widgets that display translated text must listen for language changes.
+- Use a `ChangeNotifier` / `ValueNotifier<String>`, provider, or `setState` at the root level to propagate a language change to all live widgets — do not require a full app restart.
+
+## Test modes and UI labels
+- Test-mode labels (e.g. "No Time Limit" / "不限時間", "Standard (40 min)" / "標準 (40分鐘)") must go through the same i18n map.
+- Score and result screens (points, percentage, "Correct"/"Incorrect") must be translated.
+
+## Backend sync
+- The `language` field in the user profile must match one of the allowed codes; validate it in the FastAPI `PATCH /users/me` schema (`Literal["en", "zh-Hans", "zh-Hant"]`).

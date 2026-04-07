@@ -1,0 +1,55 @@
+---
+description: Python coding standards for the FastAPI cloud backend of AMC8 AI Tutor
+globs:
+  - "**/*.py"
+  - "app/**/*.py"
+  - "api/**/*.py"
+  - "tests/**/*.py"
+alwaysApply: false
+---
+# Python Coding Standards
+
+## Style
+- Follow PEP 8; use Black for formatting (line length 88) and isort for import sorting.
+- Use snake_case for functions and variables, PascalCase for classes, UPPER_CASE for module-level constants.
+- Maximum line length of 88 characters (Black default).
+
+## Type hints
+- Annotate all function parameters and return types.
+- For Python 3.10+, prefer `X | None` over `Optional[X]`; import `Optional` from `typing` only when supporting older runtimes.
+- Define shared types in a dedicated `schemas/` or `types.py` module; do not scatter `TypedDict` / `TypeVar` definitions across files.
+
+## Async
+- Mark route handlers and DB-access helpers `async`; never call synchronous blocking I/O inside an async path.
+- Use **SQLAlchemy async** with **SQLite** (`aiosqlite` or equivalent) for database access in FastAPI routes; do not use `asyncpg` or PostgreSQL drivers.
+
+## Project structure
+```
+app/
+  main.py          # app factory, lifespan, middleware registration
+  core/            # config (pydantic-settings), exceptions, security helpers
+  routers/         # one file per domain: users, papers, sessions, results
+  models/          # SQLAlchemy ORM models
+  schemas/         # Pydantic v2 request/response schemas
+  services/        # business logic; routers call services, not ORM directly
+  db.py            # async engine, session dependency
+tests/             # mirror app/ structure; use pytest + pytest-asyncio
+```
+
+## Error handling
+- Raise `HTTPException` with a meaningful `status_code` and `detail` in route handlers.
+- Define domain-level exceptions in `app/core/exceptions.py`; translate them to `HTTPException` in a global exception handler.
+- Never expose raw SQLAlchemy errors or stack traces to API consumers.
+
+## Documentation
+- Use Google-style docstrings for public functions and service methods.
+- Keep FastAPI route `summary` and `description` fields filled; rely on automatic OpenAPI generation.
+
+## Testing
+- Use `pytest` and `pytest-asyncio` for async tests.
+- Use `httpx.AsyncClient` with the FastAPI `app` for route-level integration tests.
+- Mock external dependencies (email, cloud storage) in unit tests; use **in-memory or temp-file SQLite** for integration tests, not a shared production DB file.
+
+## Dependencies
+- Pin all versions in `requirements.txt` (production) and `requirements-dev.txt` (dev/test tools).
+- Run `pip-audit` periodically to surface known CVEs.

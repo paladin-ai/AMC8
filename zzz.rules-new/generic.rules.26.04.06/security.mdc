@@ -1,0 +1,25 @@
+---
+description: Secrets, credentials, and safe handling of sensitive data
+alwaysApply: true
+---
+# Security & Secrets
+
+## Never commit secrets
+- Do not commit API keys, tokens, passwords, private keys, OAuth client secrets, or connection strings.
+- Do not paste real secrets into code, tests, screenshots, commits, or chat logs.
+- Prefer environment variables, CI/CD secret stores, or platform-specific secure storage for runtime secrets.
+
+## Files and paths
+- Treat `.env`, `.env.*`, `*.pem`, `*service-account*.json`, and similar as sensitive; never add real values to the repo.
+- If an example config is needed, commit `.env.example` with placeholder names only.
+
+## Flutter / mobile
+- Use `flutter_secure_storage` or platform keychains for tokens on device when applicable; avoid `SharedPreferences` for secrets.
+
+## Dependencies and supply chain
+- Prefer well-maintained packages; review changelog and trust before adding new dependencies.
+- After adding or upgrading packages, run analyzer/tests; report known CVEs if upgrading cannot wait.
+
+## Future APIs
+- Validate and sanitize all external input (HTTP bodies, query params, file uploads).
+- Use HTTPS in production; pin or verify certificates if the app implements custom networking.

@@ -1,52 +1,29 @@
-<<<<<<< HEAD
 name: amc8
 description: AMC8 Learning App
+publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: ^3.11.1
 
 dependencies:
   flutter:
     sdk: flutter
+  dio: ^5.7.0
+  google_fonts: ^6.2.1
+  shared_preferences: ^2.3.3
   sqflite: ^2.3.0
-  sqflite_common_ffi: ^2.3.0  # 桌面端必备
+  sqflite_common_ffi: ^2.3.0
   path: ^1.8.3
-  path_provider: ^2.1.2       # 补全依赖
-  flutter_math_fork: ^0.7.1    # 数学公式渲染（可选）
+  path_provider: ^2.1.2
+  flutter_math_fork: ^0.7.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
+  flutter_lints: ^6.0.0
 
 flutter:
   uses-material-design: true
   assets:
-=======
-name: amc8
-description: AMC8 Learning App
-version: 1.0.0+1
-
-environment:
-  sdk: '>=3.0.0 <4.0.0'
-
-dependencies:
-  flutter:
-    sdk: flutter
-  sqflite: ^2.3.0
-  sqflite_common_ffi: ^2.3.0  # 桌面端必备
-  path: ^1.8.3
-  path_provider: ^2.1.2       # 补全依赖
-  flutter_math_fork: ^0.7.1    # 数学公式渲染（可选）
-
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^2.0.0
-
-flutter:
-  uses-material-design: true
-  assets:
->>>>>>> b5cfad5dede2128ca5792985f6dab0ae3764976d
     - assets/math_problems.db
