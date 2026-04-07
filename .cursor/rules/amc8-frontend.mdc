@@ -1,6 +1,6 @@
 ---
 description: "Frontend rules for AMC8 AI Tutor – Flutter + SQLite mobile app."
-globs: "**/*.{dart,yaml,yml}"
+globs: "frontend/**/*.{dart,yaml,yml}"
 alwaysApply: true
 ---
 
@@ -58,14 +58,15 @@ Develop **AMC8 AI Tutor**, a mobile app for practicing the AMC8 Olympic mathemat
 - Write unit tests for scoring logic, time limit enforcement, and local DB operations.
 - Follow project structure:
 
-mobile/lib/
-├── models/
-├── screens/
-├── widgets/
-├── services/ # API client, SQLite helper
-└── utils/
+frontend/lib/
+├── core/       # app_language, desktop sqflite init
+├── data/       # local SQLite (db_helper)
+├── screens/    # auth, home, papers, problems, practice, profile, dashboard
+├── services/   # API client, session prefs
+└── theme/
 
 
 ## 🔗 Backend Integration
+- When developing new features, always develop the backend FASTAPI as applicable, then deploy the backend changes to Ali Cloud. Afterwards, using the FASTAPI at Ali Cloud, develop frontend changes
 - All API calls go to FastAPI backend (see `amc8-backend.mdc`).
 - Handle offline mode gracefully – queue sync when network returns.

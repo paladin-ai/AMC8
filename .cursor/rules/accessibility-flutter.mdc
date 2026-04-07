@@ -1,7 +1,7 @@
 ---
 description: Accessibility for Flutter UI (semantics, contrast, screen readers)
 globs:
-  - "lib/**/*.dart"
+  - "frontend/lib/**/*.dart"
 alwaysApply: false
 ---
 # Accessibility (Flutter)

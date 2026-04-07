@@ -1,15 +1,15 @@
 ---
 description: When and how to add tests for this Flutter app
 globs:
-  - "lib/**/*.dart"
-  - "test/**/*.dart"
-  - "integration_test/**"
+  - "frontend/lib/**/*.dart"
+  - "frontend/test/**/*.dart"
+  - "frontend/integration_test/**"
 alwaysApply: false
 ---
 # Testing (Flutter)
 
 ## Tools
-- Use `flutter_test` for unit and widget tests under `test/`.
+- Use `flutter_test` for unit and widget tests under `frontend/test/` (run `flutter test` from `frontend/`).
 - Use `integration_test` only if the project adds that package and driver setup (optional for this repo).
 
 ## When to add or update tests
@@ -18,7 +18,7 @@ alwaysApply: false
 - **Refactors**: preserve or update existing tests; do not delete tests without replacing coverage when behavior must stay the same.
 
 ## Conventions
-- Name test files `*_test.dart` next to or under `test/` mirroring `lib/` structure where helpful.
+- Name test files `*_test.dart` under `frontend/test/` mirroring `frontend/lib/` structure where helpful.
 - Prefer `testWidgets` for UI; use `find.byType`, `find.text`, and semantics finders as appropriate.
 - Mock I/O (network, database) in tests; avoid hitting production services.
 

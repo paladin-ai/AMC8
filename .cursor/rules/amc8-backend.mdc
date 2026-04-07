@@ -1,6 +1,8 @@
 ---
 description: "Backend rules for AMC8 AI Tutor – FastAPI + SQLite (no PostgreSQL)."
-globs: "**/*.{py,toml,yml,yaml}"
+globs:
+  - "backend/**/*.py"
+  - "backend/requirements.txt"
 alwaysApply: true
 ---
 
@@ -29,6 +31,11 @@ Do **not** use PostgreSQL, `asyncpg`, or Postgres-specific deployment assumption
 
 - Mobile app uses **sqflite** locally (bundled problems + writable user data); see `amc8-frontend.mdc` and `database.mdc`.
 - Clients call this API over HTTP; handle offline/queue on the client — see `amc8-frontend.mdc`.
+
+## Repository layout (backend)
+
+- Python API code lives under **`backend/`** (e.g. `backend/app/main.py`, `backend/app/routers/`, `backend/app/db.py`).
+- Server SQLite file default: **`backend/data/app.db`** (configurable via `DATABASE_PATH` / settings).
 
 ## Detailed database conventions
 

@@ -1,15 +1,15 @@
 ---
 description: Internationalisation (i18n) rules for dynamic UI language switching (en / zh) in AMC8 AI Tutor
 globs:
-  - "lib/**/*.dart"
-  - "lib/core/app_language.dart"
+  - "frontend/lib/**/*.dart"
+  - "frontend/lib/core/app_language.dart"
 alwaysApply: false
 ---
 # Internationalisation – Flutter (AMC8 AI Tutor)
 
 ## Language codes
 - Supported languages for Phase 1: `"en"` (English), `"zh-Hans"` (Chinese Simplified), `"zh-Hant"` (Chinese Traditional).
-- The active language is stored in `AppLanguage.code` (`lib/core/app_language.dart`); use the named constants (`AppLanguage.english`, `AppLanguage.chineseSimplified`, `AppLanguage.chineseTraditional`) — never raw string literals.
+- The active language is stored in `AppLanguage.code` (`frontend/lib/core/app_language.dart`); use the named constants (`AppLanguage.english`, `AppLanguage.chineseSimplified`, `AppLanguage.chineseTraditional`) — never raw string literals.
 - The allowlist lives in `AppLanguage.supported`; add new codes there together with a `displayNames` entry and matching label keys.
 
 ## No hard-coded strings in widgets

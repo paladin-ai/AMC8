@@ -1,10 +1,7 @@
 ---
 description: Python coding standards for the FastAPI cloud backend of AMC8 AI Tutor
 globs:
-  - "**/*.py"
-  - "app/**/*.py"
-  - "api/**/*.py"
-  - "tests/**/*.py"
+  - "backend/**/*.py"
 alwaysApply: false
 ---
 # Python Coding Standards
@@ -25,20 +22,22 @@ alwaysApply: false
 
 ## Project structure
 ```
-app/
-  main.py          # app factory, lifespan, middleware registration
-  core/            # config (pydantic-settings), exceptions, security helpers
-  routers/         # one file per domain: users, papers, sessions, results
-  models/          # SQLAlchemy ORM models
-  schemas/         # Pydantic v2 request/response schemas
-  services/        # business logic; routers call services, not ORM directly
-  db.py            # async engine, session dependency
-tests/             # mirror app/ structure; use pytest + pytest-asyncio
+backend/
+  app/
+    main.py          # app factory, lifespan, middleware registration
+    core/            # config (pydantic-settings), exceptions, security helpers
+    routers/         # one file per domain: users, papers, sessions, results
+    models/          # SQLAlchemy ORM models
+    schemas/         # Pydantic v2 request/response schemas
+    services/        # business logic; routers call services, not ORM directly
+    db.py            # async engine, session dependency
+  data/              # server SQLite file(s), gitignored except .gitkeep
+  tests/             # pytest + pytest-asyncio
 ```
 
 ## Error handling
 - Raise `HTTPException` with a meaningful `status_code` and `detail` in route handlers.
-- Define domain-level exceptions in `app/core/exceptions.py`; translate them to `HTTPException` in a global exception handler.
+- Define domain-level exceptions in `backend/app/core/exceptions.py`; translate them to `HTTPException` in a global exception handler.
 - Never expose raw SQLAlchemy errors or stack traces to API consumers.
 
 ## Documentation

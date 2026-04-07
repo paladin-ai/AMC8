@@ -1,17 +1,17 @@
 ---
 description: Flutter and Dart conventions for the AMC8 AI Tutor mobile app
 globs:
-  - "lib/**/*.dart"
-  - "test/**/*.dart"
-  - "pubspec.yaml"
-  - "pubspec.lock"
-  - "analysis_options.yaml"
+  - "frontend/lib/**/*.dart"
+  - "frontend/test/**/*.dart"
+  - "frontend/pubspec.yaml"
+  - "frontend/pubspec.lock"
+  - "frontend/analysis_options.yaml"
 alwaysApply: false
 ---
 # Flutter & Dart (AMC8 AI Tutor)
 
 ## Style & analysis
-- Follow [Effective Dart](https://dart.dev/effective-dart) and the project `analysis_options.yaml` / `flutter_lints` rules.
+- Follow [Effective Dart](https://dart.dev/effective-dart) and the project `frontend/analysis_options.yaml` / `flutter_lints` rules.
 - Prefer `final` for locals assigned once; use `const` constructors and literals wherever possible.
 
 ## Widgets & UI
@@ -22,7 +22,7 @@ alwaysApply: false
 ## State & async
 - Use `async`/`await` with explicit `try`/`catch` for all I/O and network calls.
 - Keep navigation, dialog, and snackbar calls out of pure data-parsing helpers.
-- Use `dio` for HTTP calls to the FastAPI backend; centralise base URL and auth header injection in a single client helper in `lib/services/`.
+- Use `dio` for HTTP calls to the FastAPI backend; centralise base URL and auth header injection in a single client helper in `frontend/lib/services/`.
 
 ## Data & persistence (offline-first)
 - This app is offline-first: all question data and user results are cached in SQLite (`sqflite`); the backend is the source of truth but must not be required for practice.

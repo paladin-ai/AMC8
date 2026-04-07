@@ -1,9 +1,7 @@
 ---
 description: SQLite-first data layer — mobile (sqflite) and server (FastAPI)
 globs:
-  - "lib/**/*.dart"
-  - "app/**/*.py"
-  - "api/**/*.py"
+  - "frontend/lib/**/*.dart"
   - "backend/**/*.py"
   - "alembic/**"
   - "**/*.sql"
@@ -21,7 +19,7 @@ There is **no PostgreSQL** in this stack; do not introduce `asyncpg` or Postgres
 
 ### Bundled problem bank (read-only asset)
 
-- Bump `_bundledDbRevision` in `lib/data/db_helper.dart` every time `assets/math_problems.db` changes so existing installs refresh their local copy.
+- Bump `_bundledDbRevision` in `frontend/lib/data/db_helper.dart` every time `frontend/assets/math_problems.db` changes so existing installs refresh their local copy.
 - Treat the shipped asset as **read-only** for app logic; refresh by copying from assets when revision bumps.
 
 ### App-writable local data (user sessions, profile cache, etc.)
@@ -40,7 +38,7 @@ There is **no PostgreSQL** in this stack; do not introduce `asyncpg` or Postgres
 - **Concurrency**: SQLite allows one writer at a time; keep transactions **short**. Prefer **WAL** journal mode for concurrent readers + one writer where appropriate. Do not rely on PostgreSQL-style connection pooling semantics.
 - **Backups**: periodic **file copy** of the SQLite file while idle or use SQLite backup APIs / `VACUUM INTO`; verify restores in staging. Document retention policy.
 - **Schema changes**: use **Alembic** (SQLite-supported) or checked-in SQL migrations; never hand-edit production schema without a migration.
-- **ORM**: SQLAlchemy models in `app/models/` (or `backend/…`); separate from Pydantic schemas in `app/schemas/`. Use **async** access via `aiosqlite` (or equivalent) with FastAPI’s async routes.
+- **ORM**: SQLAlchemy models in `backend/app/models/`; separate from Pydantic schemas in `backend/app/schemas/`. Use **async** access via `aiosqlite` (or equivalent) with FastAPI’s async routes.
 - Add indexes on high-frequency columns: `user_id`, `year`, `problem_number`, `session_id`, `created_at`.
 - Store timestamps in **UTC**; convert to local time on clients.
 - Prefer explicit column lists over `SELECT *` in hot paths.

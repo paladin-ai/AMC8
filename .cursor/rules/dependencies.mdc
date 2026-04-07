@@ -1,8 +1,8 @@
 ---
 description: Dependency and version policy for Dart / Flutter (pubspec)
 globs:
-  - "pubspec.yaml"
-  - "pubspec.lock"
+  - "frontend/pubspec.yaml"
+  - "frontend/pubspec.lock"
 alwaysApply: false
 ---
 # Dependencies (Dart / Flutter)
